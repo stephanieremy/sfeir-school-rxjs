@@ -11,14 +11,38 @@ export interface Observable<T> {
   subscribe(observer: Observer<T>): void;
 }
 
-export declare function makeObservable<T>(
-  subscribe: (observer: Observer<T>) => void
-): Observable<T>;
+export function makeObservable<T>(subscribe: (observer: Observer<T>) => void): Observable<T> {
+  return {
+    subscribe,
+  }
+}
 
-export declare function readLines(
-  filename: string
-): Observable<number>;
+export function readLines(filename: string): Observable<number> {
+  return makeObservable<number> (observer =>  {
+    const fileStream = openInputFile(filename);
+    const rl = readline.createInterface(fileStream); 
+  
+    rl.on('line', line => {
+        const number = parseInt(line, 10);
+        observer.next(number);
+    });
 
-export declare function map<T, U>(
-  f: (v: T) => U
-): (source: Observable<T>) => Observable<U>;
+    rl.on('close', () => {
+      observer.complete();
+    });
+    }
+  )
+}
+
+export function map<T, U> (fonction: (value: T) => U): (source : Observable<T>) => Observable<U> {
+  return source =>  makeObservable(observer => {
+    source.subscribe({
+      next(value) {
+        observer.next(fonction(value));
+      },
+      complete() {
+        observer.complete();
+      }
+    })
+  })
+}

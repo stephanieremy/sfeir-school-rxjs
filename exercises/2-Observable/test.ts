@@ -3,7 +3,7 @@ import {
   makeObservable,
   readLines,
   map
-} from './solution';
+} from './code';
 
 describe('create a range and double it', () => {
   const range = (from: number, to: number) =>
