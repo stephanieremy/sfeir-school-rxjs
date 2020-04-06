@@ -2,7 +2,8 @@ import {
   getModuleMasses,
   getRequiredFuel,
   getTotalRequiredFuel
-} from './solution';
+//} from './solution';
+}from './code';
 
 describe('getModuleMasses', () => {
   const moduleMasses = getModuleMasses('data.txt');
