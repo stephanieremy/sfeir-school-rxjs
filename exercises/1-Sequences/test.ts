@@ -3,7 +3,7 @@ import {
   sequenceFrom,
   getRequiredFuel,
   getTotalRequiredFuel
-} from './solution';
+} from './code';
 
 describe('sequenceFrom', () => {
   it('should iterate over source', () => {
