@@ -4,14 +4,19 @@ import {
   accumulateFuelForMass
 } from '../lib';
 
-export declare function getModuleMasses(
-  filename: string
-): number[];
+export function getModuleMasses(filename: string) {
+  return readInputFile(filename).split('\n')
+                                .map(n => parseInt(n, 10))
+                                .filter(n => !isNaN(n));
+}
 
-export declare function getRequiredFuel(
-  masses: number[]
-): number;
+export function getRequiredFuel(masses: number[]) {
+  return masses.map(getRequiredFuelForMass)
+                .filter(n => n > 0)
+                .reduce((accumulator, value) => accumulator + value, 0);
+}
 
-export declare function getTotalRequiredFuel(
-  masses: number[]
-): number;
+export function getTotalRequiredFuel( masses: number[]) {
+  return masses.flatMap(n => [...accumulateFuelForMass(n)])
+               .reduce((accumulator, n) => accumulator + n);
+}
