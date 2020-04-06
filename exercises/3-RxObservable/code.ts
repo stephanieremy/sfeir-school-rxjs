@@ -1,6 +1,6 @@
 import * as readline from 'readline';
 
-import { Observable, from } from 'rxjs';
+import { Observable, from, pipe } from 'rxjs';
 import { map, filter, reduce, flatMap } from 'rxjs/operators';
 
 import {
@@ -9,18 +9,41 @@ import {
   accumulateFuelForMass
 } from '../lib';
 
-declare function readLines(
-  filename: string
-): Observable<string>;
+export function readLines(filename: string ) {
+    return new Observable<string>(observer => {
+      const fileRead = openInputFile(filename);
+      const rl = readline.createInterface(fileRead);
+  
+      rl.on('line', line => {
+        observer.next(line);
+      });
+  
+      rl.on('close', () => {
+        observer.complete();
+      });
+    });
+}
 
-export declare function getModuleMasses(
-  filename: string
-): Observable<number>;
+export  function getModuleMasses( filename: string) {
+  return readLines(filename).pipe(
+    map(line => parseInt(line, 10)),
+    filter(mass => !isNaN(mass))
+  );
+}
 
-export declare function getRequiredFuel(
-  masses: Observable<number>
-): Observable<number>;
 
-export declare function getTotalRequiredFuel(
-  masses: Observable<number>
-): Observable<number>;
+export  function getRequiredFuel(masses: Observable<number>){
+  return masses.pipe(
+    map(getRequiredFuelForMass),
+   filter(n => n > 0),
+   reduce((a: number,b: number) => a + b)
+  )
+}
+
+export  function getTotalRequiredFuel(masses: Observable<number>) {
+  return masses.pipe(
+    flatMap(n => from (accumulateFuelForMass(n))),
+    reduce((a: number,b : number) => a + b)
+  )
+
+}
